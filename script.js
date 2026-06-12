@@ -4,7 +4,7 @@ let Artist = ""
 const searchAlbum = document.getElementById("searchAlbum")
 const searchArtist = document.getElementById("searchArtist")
 
-searchAlbum.addEventListener("enter",
+searchAlbum.addEventListener("input",
     async(e) => {
         albumName = e.target.value;
         console.log(albumName);
@@ -14,7 +14,7 @@ searchAlbum.addEventListener("enter",
     }
 )
 
-searchArtist.addEventListener("enter",
+searchArtist.addEventListener("input",
     async(e) => {
         Artist = e.target.value;
         console.log(Artist);
