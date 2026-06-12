@@ -2,7 +2,10 @@ let albumName = ""
 let Artist = ""
 
 const searchAlbum = document.getElementById("searchAlbum")
+searchAlbum.focus()
 const searchArtist = document.getElementById("searchArtist")
+searchArtist.focus()
+const searchBtn = document.getElementById("search")
 
 searchAlbum.addEventListener("input",
     async(e) => {
@@ -18,6 +21,14 @@ searchArtist.addEventListener("input",
     async(e) => {
         Artist = e.target.value;
         console.log(Artist);
+        await getArtistAlbumDetails()
+        await getAlbumPic()
+        await getTracklist()
+    }
+)
+
+searchBtn.addEventListener("click",
+    async () =>{
         await getArtistAlbumDetails()
         await getAlbumPic()
         await getTracklist()
