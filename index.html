@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Album Viewer</title>
+</head>
+<body>
+    <div class="input">
+        <input type="search" placeholder="Search Albums, EP, Singles" id="searchAlbum" class="search">
+        <input type="search" placeholder="artist name" id="searchArtist" class="search">
+    </div>
+    <div class="album-title"></div>
+    <div class="vinyl-track">
+        <div class="spinning-vinyl">
+            <div class="vinyl-record">
+                <div class="vinyl-label"></div>
+            </div>
+            <div class="album-jacket">
+                <img alt="Surreal Album Art" class="cover-image">
+            </div>
+        </div>
+        <div class="track-list-container"></div>
+    </div>
+    <script src="https://unpkg.com/node-vibrant@3.1.6/dist/vibrant.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
