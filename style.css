@@ -60,8 +60,10 @@
 
 @font-face {
     font-family: "OldHaroldRee Bold";
-    src: url(OldHaroldRee\ Bold.ttf);
+    src: url("OldHaroldRee Bold.ttf");
     font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
 body {
@@ -212,9 +214,31 @@ section {
     transition: background 320ms ease, box-shadow 320ms ease;
 }
 
+.track-list-container h1{
+    margin: 0 0 10px;
+    color: var(--album-title-color);
+    font-family: "OldHaroldRee Bold", Arial, Helvetica, sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: 0;
+    text-shadow: 0 10px 24px color-mix(in srgb, var(--album-vibrant) 16%, transparent);
+}
+
 .tracklist {
     display: grid;
     gap: 8px;
+}
+
+.tracklist-title {
+    margin: 0 0 10px;
+    color: var(--album-title-color);
+    font-family: "OldHaroldRee Bold", Arial, Helvetica, sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: 0;
+    text-shadow: 0 10px 24px color-mix(in srgb, var(--album-vibrant) 16%, transparent);
 }
 
 .tracklist p {
@@ -232,6 +256,109 @@ section {
 
 .tracklist p:hover {
     border-color: color-mix(in srgb, var(--album-vibrant) 45%, transparent);
+    background: var(--album-track-hover-background);
+}
+
+#openalbumdetail {
+    justify-self: start;
+    min-height: 46px;
+    padding: 0 18px;
+    border: 1px solid color-mix(in srgb, var(--album-vibrant) 48%, rgba(22, 22, 22, 0.12));
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--palette-dark-vibrant) 70%, var(--palette-vibrant) 30%), color-mix(in srgb, var(--palette-dark-muted) 58%, var(--palette-muted) 42%));
+    color: color-mix(in srgb, var(--palette-light-vibrant) 80%, white 20%);
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0;
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--album-vibrant) 20%, transparent);
+    transition: transform 180ms ease, box-shadow 220ms ease, filter 220ms ease;
+}
+
+#openalbumdetail:hover {
+    transform: translateY(-1px);
+    filter: saturate(1.12);
+    box-shadow: 0 16px 30px color-mix(in srgb, var(--album-vibrant) 26%, transparent);
+}
+
+#openalbumdetail:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--album-vibrant) 28%, transparent),
+        0 16px 30px color-mix(in srgb, var(--album-vibrant) 26%, transparent);
+}
+
+#albumdetails {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: color-mix(in srgb, var(--album-dark-vibrant) 54%, rgba(0, 0, 0, 0.58));
+    backdrop-filter: blur(12px);
+}
+
+/* #albumdetails:not(:empty) {
+    display: flex;
+} */
+
+
+.albumdetailscontent {
+    position: relative;
+    width: min(100%, 680px);
+    max-height: min(680px, 86vh);
+    overflow: auto;
+    padding: clamp(24px, 5vw, 44px);
+    border: 1px solid var(--album-panel-border);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, var(--album-panel-top), var(--album-panel-bottom)),
+        linear-gradient(120deg, color-mix(in srgb, var(--album-vibrant) 12%, transparent), color-mix(in srgb, var(--album-muted) 16%, transparent));
+    color: var(--album-text);
+    box-shadow: 0 32px 80px color-mix(in srgb, black 32%, transparent);
+}
+
+.albumdetailscontent h1,
+#h1AlbumDetail {
+    margin: 0 40px 18px 0;
+    color: var(--album-title-color);
+    font-family: "OldHaroldRee Bold", Arial, Helvetica, sans-serif;
+    font-size: clamp(2rem, 8vw, 4.2rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: 0;
+}
+
+.albumdetailscontent p {
+    margin: 0;
+    color: var(--album-track-text);
+    font-size: 1rem;
+    line-height: 1.65;
+}
+
+#closemodal {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--album-muted) 24%, transparent);
+    border-radius: 50%;
+    background: var(--album-search-background);
+    color: var(--album-text);
+    cursor: pointer;
+    font-size: 1.15rem;
+    line-height: 1;
+    transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+#closemodal:hover {
+    transform: rotate(90deg);
+    border-color: color-mix(in srgb, var(--album-vibrant) 48%, transparent);
     background: var(--album-track-hover-background);
 }
 
@@ -313,7 +440,7 @@ section {
     position: absolute;
     inset: 31%;
     border-radius: 50%;
-    background: var(--label-image) center / cover;
+    background: url(music-note-circle-svgrepo-com.svg) center / cover;
     border: 6px solid var(--album-vinyl-label-ring);
     box-shadow:
         inset 0 0 0 1px rgba(0, 0, 0, 0.16),
@@ -370,6 +497,10 @@ section {
     .track-list-container {
         width: min(100%, 620px);
     }
+
+    #openalbumdetail {
+        justify-self: center;
+    }
 }
 
 @media (max-width: 620px) {
@@ -420,5 +551,19 @@ section {
         min-height: 220px;
         max-height: none;
         padding: 14px;
+    }
+
+    #albumdetails {
+        padding: 14px;
+    }
+
+    .albumdetailscontent {
+        max-height: 88vh;
+        padding: 24px 18px;
+    }
+
+    .albumdetailscontent h1,
+    #h1AlbumDetail {
+        margin-right: 42px;
     }
 }
