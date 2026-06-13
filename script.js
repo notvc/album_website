@@ -39,9 +39,6 @@ searchBtn.addEventListener("click",
 const albumDetails = document.getElementById("albumdetails")
 openAlbumDetails.addEventListener("click",
     async() => {
-
-        const summary = await getAlbumReleaseGroupID();
-        console.log(summary)
             albumDetails.innerHTML = ""
             albumDetails.style.display = "flex"
             // albumDetails.classList.add("open")
@@ -67,6 +64,13 @@ openAlbumDetails.addEventListener("click",
                 albumDetails.style.display = "none";
                 // albumDetails.classList.remove("open")
             });
+
+            h1AlbumDetail.textContent = "NO SUMMARY FOUND"
+            pAlbumDetail.textContent = "No searches yet"
+            
+            const summary = await getAlbumReleaseGroupID();
+            console.log(summary)
+
         if (summary){
             h1AlbumDetail.textContent = `${albumTitle}`
             pAlbumDetail.textContent = `${summary.extract}`
