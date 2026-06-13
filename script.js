@@ -38,8 +38,10 @@ searchBtn.addEventListener("click",
 
 const albumDetails = document.getElementById("albumdetails")
 openAlbumDetails.addEventListener("click",
-    () => {
-        if (summary){
+    async() => {
+
+        const summary = await getAlbumReleaseGroupID();
+        console.log(summary)
             albumDetails.innerHTML = ""
             albumDetails.style.display = "flex"
             // albumDetails.classList.add("open")
@@ -55,11 +57,9 @@ openAlbumDetails.addEventListener("click",
 
             const h1AlbumDetail = document.createElement("h1")
             h1AlbumDetail.id = "h1AlbumDetail"
-            h1AlbumDetail.textContent = `${albumTitle}`
             albumDetailsContent.appendChild(h1AlbumDetail)
 
             const pAlbumDetail = document.createElement("p")
-            pAlbumDetail.textContent = `${summary.extract}`
             albumDetailsContent.appendChild(pAlbumDetail)
 
             closeAlbumDetails.addEventListener("click", () => {
@@ -67,30 +67,13 @@ openAlbumDetails.addEventListener("click",
                 albumDetails.style.display = "none";
                 // albumDetails.classList.remove("open")
             });
+        if (summary){
+            h1AlbumDetail.textContent = `${albumTitle}`
+            pAlbumDetail.textContent = `${summary.extract}`
         }
-        else{
-            albumDetails.innerHTML = ""
-            albumDetails.style.display = "flex"
-
-            const albumDetailsContent = document.createElement("div")
-            albumDetailsContent.className = "albumdetailscontent"
-            albumDetails.appendChild(albumDetailsContent)
-            
-            const closeAlbumDetails = document.createElement("span")
-            closeAlbumDetails.textContent = "✕";
-            closeAlbumDetails.id = "closemodal"
-            albumDetailsContent.appendChild(closeAlbumDetails)
-            
-            const h1AlbumDetail = document.createElement("h1")
-            h1AlbumDetail.id = "h1AlbumDetail"
-            h1AlbumDetail.textContent = `NO SUMMARY FOUND`
-            albumDetailsContent.appendChild(h1AlbumDetail)
-
-            closeAlbumDetails.addEventListener("click", () => {
-                albumDetails.innerHTML = "";
-                albumDetails.style.display = "none";
-                // albumDetails.classList.remove("open")
-            })
+        else {
+            h1AlbumDetail.textContent = "NO SUMMARY FOUND"
+            pAlbumDetail.textContent = "Wikipedia does not have a summary for this album."
         }
     })
 
@@ -123,67 +106,45 @@ async function getArtistAlbumDetails() {
     await getAlbumReleaseGroupID()
 }
 
-let summary = ""
 async function getAlbumReleaseGroupID() {
-        const res = await fetch(`https://musicbrainz.org/ws/2/release/${albumID}?inc=release-groups&fmt=json`);
+    const res = await fetch(
+        `https://musicbrainz.org/ws/2/release/${albumID}?inc=release-groups&fmt=json`
+    );
 
-        const data = await res.json();
+    const data = await res.json();
 
-        const releaseGroupID = data["release-group"].id;
-        console.log(releaseGroupID);
+    const releaseGroupID = data["release-group"].id;
 
-        await getWikiUrl()
-        // MusicBrainz
-        //     ↓
-        // Find Wikidata URL
-        //     ↓
-        // https://www.wikidata.org/wiki/Q5104794
-        //     ↓
-        // Extract Q5104794
-        //     ↓
-        // Fetch Wikidata JSON
-        //     ↓
-        // Get Wikipedia title
-        //     ↓
-        // "Take Care"
-        //     ↓
-        // Fetch Wikipedia Summary
-        //     ↓
-        // summary.extract
-        //     ↓
-        // "Take Care is the second studio album..."
-        async function getWikiUrl() {
-            const res = await fetch(`https://musicbrainz.org/ws/2/release-group/${releaseGroupID}?inc=url-rels&fmt=json`);
+    const releaseGroupRes = await fetch(
+        `https://musicbrainz.org/ws/2/release-group/${releaseGroupID}?inc=url-rels&fmt=json`
+    );
 
-            const data = await res.json();
+    const releaseGroupData = await releaseGroupRes.json();
 
-            console.log(data.relations);
+    const wikidataRelation = releaseGroupData.relations.find(
+        rel => rel.type === "wikidata"
+    );
 
-            const wikidataRelation = data.relations.find(rel => rel.type === "wikidata");
-            console.log(wikidataRelation);
-
-            if (wikidataRelation) {
-                const qid = wikidataRelation.url.resource.split("/").pop();
-
-                const wikidataRes = await fetch(
-                    `https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`
-                );
-
-                const wikidata = await wikidataRes.json();
-
-                const wikiTitle =
-                    wikidata.entities[qid].sitelinks.enwiki.title;
-
-                const summaryRes = await fetch(
-                    `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`
-                );
-
-                summary = await summaryRes.json();
-
-                console.log(summary.extract);
-            }
-        }
+    if (!wikidataRelation) {
+        return null;
     }
+
+    const qid = wikidataRelation.url.resource.split("/").pop();
+
+    const wikidataRes = await fetch(
+        `https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`
+    );
+
+    const wikidata = await wikidataRes.json();
+
+    const wikiTitle = wikidata.entities[qid].sitelinks.enwiki.title;
+
+    const summaryRes = await fetch(
+        `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`
+    );
+
+    return await summaryRes.json();
+}
 
 let p = ""
 async function getTracklist() {
