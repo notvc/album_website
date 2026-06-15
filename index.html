@@ -9,8 +9,28 @@
 </head>
 <body>
     <div class="input">
-        <input type="search" placeholder="Search Albums, EP, Singles" id="searchAlbum" class="search">
-        <input type="search" placeholder="artist name" id="searchArtist" class="search">
+        <div class="search-field artist-field">
+            <input type="search"
+            placeholder="Artist Name"
+            id="searchArtist"
+            class="search"
+            aria-autocomplete="list"
+            aria-controls="artistSuggestionMenu"
+            autocomplete="off">
+            <datalist id="suggestartist"></datalist>
+            <div class="suggestion-menu" id="artistSuggestionMenu" role="listbox" aria-label="Artist suggestions"></div>
+        </div>
+        <div class="search-field album-field">
+            <input type="search"
+            placeholder="Search Albums, EP, Singles"
+            id="searchAlbum"
+            class="search"
+            aria-autocomplete="list"
+            aria-controls="albumSuggestionMenu"
+            autocomplete="off">
+            <datalist id="suggestalbum"></datalist>
+            <div class="suggestion-menu" id="albumSuggestionMenu" role="listbox" aria-label="Album suggestions"></div>
+        </div>
         <button type="submit" id="search" aria-label="Search">
             <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                 <circle class="search-icon-ring" cx="10.5" cy="10.5" r="6.5"></circle>

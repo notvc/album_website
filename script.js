@@ -7,34 +7,48 @@ const searchArtist = document.getElementById("searchArtist")
 searchArtist.focus()
 const searchBtn = document.getElementById("search")
 const openAlbumDetails = document.getElementById("openalbumdetail")
+const suggestArtist = document.getElementById("suggestartist")
+const suggestAlbum = document.getElementById("suggestalbum")
+const artistSuggestionMenu = document.getElementById("artistSuggestionMenu")
+const albumSuggestionMenu = document.getElementById("albumSuggestionMenu")
+
+let timeoutAlbum;
+
+let timeoutArtist;
 
 searchAlbum.addEventListener("input",
-    async(e) => {
-        albumName = e.target.value;
-        console.log(albumName);
-        await getArtistAlbumDetails()
-        await getAlbumPic()
-        await getTracklist()
-    }
+        async(e) => {
+                albumName = e.target.value;
+                console.log(albumName);
+
+                await getAlbumSuggestions()
+
+                await loadAlbumResults()
+            }
 )
 
 searchArtist.addEventListener("input",
-    async(e) => {
-        Artist = e.target.value;
-        console.log(Artist);
-        await getArtistAlbumDetails()
-        await getAlbumPic()
-        await getTracklist()
-    }
+        async(e) => {
+                Artist = e.target.value;
+                console.log(Artist);
+                await getArtistSuggestions()
+
+                await loadAlbumResults()
+            }
 )
 
 searchBtn.addEventListener("click",
     async () =>{
-        await getArtistAlbumDetails()
-        await getAlbumPic()
-        await getTracklist()
+        await loadAlbumResults()
     }
 )
+
+document.addEventListener("click", (event) => {
+    if (!event.target.closest(".search-field")) {
+        artistSuggestionMenu.innerHTML = "";
+        albumSuggestionMenu.innerHTML = "";
+    }
+});
 
 const albumDetails = document.getElementById("albumdetails")
 openAlbumDetails.addEventListener("click",
@@ -64,10 +78,10 @@ openAlbumDetails.addEventListener("click",
                 albumDetails.style.display = "none";
                 // albumDetails.classList.remove("open")
             });
-
+            
             h1AlbumDetail.textContent = "NO SUMMARY FOUND"
             pAlbumDetail.textContent = "No searches yet"
-            
+
             const summary = await getAlbumReleaseGroupID();
             console.log(summary)
 
@@ -84,6 +98,100 @@ openAlbumDetails.addEventListener("click",
 document.body.addEventListener("dblclick", () => {
     document.documentElement.classList.toggle("dark");
 });
+
+async function getArtistSuggestions() {
+    albumSuggestionMenu.innerHTML = "";
+
+    if (!Artist.trim()) {
+        suggestArtist.innerHTML = "";
+        artistSuggestionMenu.innerHTML = "";
+        return;
+    };
+
+    const res = await fetch(`https://musicbrainz.org/ws/2/artist/?query=${Artist}&fmt=json`)
+
+    const data = await res.json()
+
+    suggestArtist.innerHTML = ""
+
+    const artists = data.artists.slice(0, 5).map((artist) => artist.name);
+
+    artists.forEach((artistName) => {
+        const option = document.createElement("option");
+        option.value = artistName;
+        suggestArtist.appendChild(option);
+    });
+
+    renderSuggestionMenu(artistSuggestionMenu, artists, async (artistName) => {
+        Artist = artistName;
+        searchArtist.value = artistName;
+        suggestArtist.innerHTML = "";
+        artistSuggestionMenu.innerHTML = "";
+        albumSuggestionMenu.innerHTML = "";
+        await loadAlbumResults();
+    });
+}
+
+async function getAlbumSuggestions() {
+    artistSuggestionMenu.innerHTML = "";
+
+    if (!albumName.trim()) {
+        suggestAlbum.innerHTML = "";
+        albumSuggestionMenu.innerHTML = "";
+        return;
+    };
+
+    const res = await fetch(
+        `https://musicbrainz.org/ws/2/release?query=artist:${encodeURIComponent(Artist)} AND release:${encodeURIComponent(albumName)}&fmt=json`
+    );
+
+    const data = await res.json()
+
+    suggestAlbum.innerHTML = ""
+
+    const releases = data.releases.slice(0, 5).map((release) => release.title);
+
+    releases.forEach((releaseTitle) => {
+        const option = document.createElement("option");
+        option.value = releaseTitle;
+        suggestAlbum.appendChild(option);
+    });
+
+    renderSuggestionMenu(albumSuggestionMenu, releases, async (releaseTitle) => {
+        albumName = releaseTitle;
+        searchAlbum.value = releaseTitle;
+        suggestAlbum.innerHTML = "";
+        artistSuggestionMenu.innerHTML = "";
+        albumSuggestionMenu.innerHTML = "";
+        await loadAlbumResults();
+    });
+}
+
+async function loadAlbumResults() {
+    if (!Artist.trim() || !albumName.trim()) return;
+
+    await getArtistAlbumDetails()
+    await getAlbumPic()
+    await getTracklist()
+}
+
+function renderSuggestionMenu(menu, suggestions, onSelect) {
+    menu.innerHTML = "";
+
+    suggestions.forEach((suggestion) => {
+        const optionButton = document.createElement("button");
+        optionButton.type = "button";
+        optionButton.className = "suggestion-option";
+        optionButton.textContent = suggestion;
+        optionButton.setAttribute("role", "option");
+
+        optionButton.addEventListener("click", async () => {
+            await onSelect(suggestion);
+        });
+
+        menu.appendChild(optionButton);
+    });
+}
 
 let albumID = ""
 let albumTitle = ""
